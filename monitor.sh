@@ -298,8 +298,24 @@ function infoExtra
     echo "Utilizatorul conectat in acest moment: $utilCurent"
 }
 
+function afiseazaInode
+{
+    inoduri=$(ls -li | tail -n +2 | cut -d " " -f1 | tr "\n" ",")
+    echo "Inodurile fisierelor din directorul curent: $inoduri"
+}
+
+function hardlinks_softlinks
+{
+    numar_hardlinks=$(find / -maxdepth 1 -type f -links +1 -o -type d -links +1 2>/dev/null | wc -l)
+    echo "Numarul de hardlink-uri din sistem: $numar_hardlinks"
+
+    numar_softlinks=$(find / -maxdepth 1 -type l 2>/dev/null | wc -l)
+    echo "Numarul de softlink-uri din sistem: $numar_softlinks"
+}
 
 echo 
 echo "  Informatii extra:"
 echo 
 infoExtra
+afiseazaInode
+hardlinks_softlinks

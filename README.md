@@ -20,7 +20,9 @@ Tool monitorizare sisteme linux prin SSH și centralizare
     c. detalii din jurnalul de autentificare
     d. sumele de control ale fisierelor din directorul curent
 5. Extragere detalii despre o aplicatie specifica.
-6. EXtragere detalii generale despre sistem (ex. ultimii utilizatori conectati, utilizatorul curent).
+6. Extragere detalii generale despre sistem (ex. ultimii utilizatori conectati, utilizatorul curent).
+    - afisare lista inode-urilor fisierelor din directorul curent
+    - afisare numar hardlinks si softlinks din sistem
 7. Salvarea datelor despre masinile virtuale monitorizate intr-un fisier specific.
 8. Trimiterea rezultatului specific fiecarei masini virtuale pe aceasta, prin ssh.
 
