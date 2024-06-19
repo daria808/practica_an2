@@ -89,6 +89,7 @@ III. Securitate
 4) sumele de control ale fisierelor din directorul curent
 - am doua fisiere: "sumeInitiale", respectiv "sumeVerificare"
 - verific daca fisierul "sumeInitiale" exista, iar in caz contrar il creez calculand sumele de control din directorul curent folosind comanda "sha256sum"
+- compar cele doua fisiere, "sumeInitiale" si "sumeVerificare" pentru a vedea daca s-au efectuat modificari asupra lor
 
 IV. Aplicatii specifice
 
