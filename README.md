@@ -25,6 +25,7 @@ Tool monitorizare sisteme linux prin SSH și centralizare
     - afisare numar hardlinks si softlinks din sistem
 7. Salvarea datelor despre masinile virtuale monitorizate intr-un fisier specific.
 8. Trimiterea rezultatului specific fiecarei masini virtuale pe aceasta, prin ssh.
+9. Modificare astfel incat conectarea prin ssh sa fie facuta folosind parola sistemului linux.
 
 # 17.06.2024
 README modificat pentru test
@@ -107,3 +108,14 @@ V. Diverse
 1) afisez ultimii utilizatori care au fost conectati pe sistem folosind comanda "last"
 
 2) afisez utilizatorul conectat in momentul respectiv folosind comanda: "whoami"
+
+# 20.06.2024
+
+1. Am modificat pe masina tinta si pe masina gazda fisierul /etc/ssh/sshd_config, astfel incat sa am urmatoarele campuri decomentate sau adaugate astfel:
+    * PubkeyAuthentication no
+    * PasswordAuthentication yes
+! Aceste modificari au fost necesare pentru a ma conecta prin ssh folosind parola
+
+2. Am instalat inca o masina virtuala in Virtual Box si am configurat-o astfel incat sa ma pot conecta de pe LinuxMint pe aceasta folosind ssh.
+
+3. Am creat un nou script prin intermediul caruia ma voi conecta la masinile tinta pentru a le monitoriza. Voi salva rezultatele monitorizarii intr-un fisier salvat in directorul curent al masinii tina.

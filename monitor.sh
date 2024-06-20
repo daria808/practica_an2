@@ -1,5 +1,10 @@
 #!/bin/bash
 
+filename="$1"
+touch "$filename"
+echo "Statistici:" > "$filename"
+echo >> "$filename"
+
 # PERFORMANTA GENERALA
 
 # procentul de timp CPU utilizat de procesele din sistem
@@ -19,7 +24,7 @@ function procentTimpProcese
     done 
 
     cpu_total=$(echo "scale=2; $cpu_total / $numar_cpu" | bc)
-    echo "Procentul total de utilizare a CPU de catre procesele din sistem este: $cpu_total%"
+    echo "Procentul total de utilizare a CPU de catre procesele din sistem este: $cpu_total%" >> "$filename"
 }
 
 # cantitatea de memorie RAM utilizata si disponibila
@@ -32,7 +37,7 @@ function memorieRAM
     mem_folosita=$(echo "$detalii_memorie" | cut -d' ' -f3)
     mem_disponibila=$(echo "$detalii_memorie" | cut -d' ' -f4)
 
-    echo "Informatii despre memoria RAM -> totala: $mem_totala, utilizata: $mem_folosita, disponibila: $mem_disponibila"
+    echo "Informatii despre memoria RAM -> totala: $mem_totala, utilizata: $mem_folosita, disponibila: $mem_disponibila" >> "$filename"
 }
 
 # numarul toatal de procese, procese care ruleaza, procese care asteapta sa fie rulate si load average
@@ -45,7 +50,7 @@ function detaliiProcese
     numar_procese_w=$(ps -eo stat --no-headers |  grep -E "D|I" | wc -l)
 
 
-    echo "Numar_procese: $numar_procese, numar_procese_running: $numar_procese_r, numar_procese_waiting: $numar_procese_w, Load_average: $load_average"
+    echo "Numar_procese: $numar_procese, numar_procese_running: $numar_procese_r, numar_procese_waiting: $numar_procese_w, Load_average: $load_average" >> "$filename"
 }
 
 # cantitatea de spatiu pe disk utilizat si disponibil pentru partitiile sistemului
@@ -68,7 +73,7 @@ function spatiuDisk
         total_disponibil=$(echo "$total_disponibil + $du_disp" | bc)
     done
 
-    echo "Disk_usage_folosit: $total_folosit, disk_usage_disponibil: $total_disponibil"
+    echo "Disk_usage_folosit: $total_folosit, disk_usage_disponibil: $total_disponibil" >> "$filename"
 }
 
 # rate de citire si scriere a discurilor
@@ -78,7 +83,7 @@ function rateCitireScriere
     # pentru "iostat" am nevoie de bibliotecta "sysstat"
     if ! command -v iostat &> /dev/null
     then
-        echo "sysstat nu este instalat. Instalare..."
+        echo "sysstat nu este instalat. Instalare..." >> "$filename"
 
         sudo apt-get update
         sudo apt-get install sysstat -y
@@ -106,13 +111,13 @@ function rateCitireScriere
         fi 
     done 
 
-    echo "rata_citire_disk: $total_citire kB_read/s, rata_scriere_disk: $total_scriere kB_wrtn/s"
+    echo "rata_citire_disk: $total_citire kB_read/s, rata_scriere_disk: $total_scriere kB_wrtn/s" >> "$filename"
 }
 
 
 
-echo "  Performanta generala:"
-echo 
+echo "  Performanta generala:" >> "$filename"
+echo >> "$filename"
 procentTimpProcese
 memorieRAM
 detaliiProcese
@@ -127,9 +132,9 @@ rateCitireScriere
 
 function infoProcese
 {
-    echo "Utilizarea CPU si memorie a fiecarui proces:"
-    ps -eo pid,%cpu,%mem --sort=-%cpu | head -n 20
-    echo
+    echo "Utilizarea CPU si memorie a fiecarui proces:" >> "$filename"
+    ps -eo pid,%cpu,%mem --sort=-%cpu | head -n 20 >> "$filename"
+    echo >> "$filename"
 }
 
 # cantitatea de trafic trimisa si primita
@@ -139,7 +144,7 @@ function traficTransmisPrimit
     pachete_primite=$(grep -E "enp0s3" /proc/net/dev | tr -s " " | cut -d" " -f3)
     pachete_trimise=$(grep -E "enp0s3" /proc/net/dev | tr -s " " | cut -d" " -f10)
 
-    echo "Pachete trimise: $pachete_trimise, pachete primite: $pachete_primite"
+    echo "Pachete trimise: $pachete_trimise, pachete primite: $pachete_primite" >> "$filename"
     
 }
 
@@ -149,13 +154,13 @@ function conexiuniActive
 {
     numar_conexiuni=$(ss -s | head -n1 | cut -d" " -f2)
 
-    echo "Numarul de conexiuni active: $numar_conexiuni"
+    echo "Numarul de conexiuni active: $numar_conexiuni" >> "$filename"
 }
 
 
-echo 
-echo "  Resurse de sistem:"
-echo
+echo >> "$filename"
+echo "  Resurse de sistem:" >> "$filename"
+echo >> "$filename"
 infoProcese
 traficTransmisPrimit
 conexiuniActive
@@ -168,8 +173,8 @@ conexiuniActive
 function jurnaleSistem
 {
     jurnal=$(journalctl -n 10)
-    echo "Ultimele 10 intrari in jurnalul de sistem:"
-    echo "$jurnal" 
+    echo "Ultimele 10 intrari in jurnalul de sistem:" >> "$filename"
+    echo "$jurnal" >> "$filename"
 }
 
 # conexiunile active din retea
@@ -178,17 +183,17 @@ function conexiuniRetea
 {
     if ! command -v netstat &> /dev/null
     then
-        echo "netstat nu este instalat. Instalare..."
+        echo "netstat nu este instalat. Instalare..." >> "$filename"
 
         sudo apt-get update
         sudo apt-get install -y net-tools
     fi 
 
     conex=$(netstat -tuln)
-    echo 
-    echo "Conexiuni active:"
-    echo "$conex" 
-    echo 
+    echo >> "$filename"
+    echo "Conexiuni active:" >> "$filename"
+    echo "$conex" >> "$filename"
+    echo >> "$filename"
 }
 
 # detalii din jurnalul de autentificare
@@ -196,10 +201,10 @@ function conexiuniRetea
 function jurnalAuth
 {
     jurnAuth=$(tail -n 10 /var/log/auth.log)
-    echo
-    echo "Ultimele 10 mesaje din jurnalul de autentificare auth.log"
-    echo "$jurnAuth"
-    echo 
+    echo >> "$filename"
+    echo "Ultimele 10 mesaje din jurnalul de autentificare auth.log" >> "$filename"
+    echo "$jurnAuth" >> "$filename"
+    echo >> "$filename"
 }
 
 # calculez sumele de control a fisierelor din directorul curent
@@ -216,16 +221,16 @@ function sumeControl
     
     if cmp -s "sumeInitiale" "sumeComparare"
     then
-        echo "Fisierele din sistem NU sunt modificate!"
+        echo "Fisierele din sistem NU sunt modificate!" >> "$filename"
     else
-        echo "Fisierele din sistem sunt modificate!"
+        echo "Fisierele din sistem sunt modificate!" >> "$filename"
     fi
 }
 
 
-echo 
-echo "  Securitate:"
-echo 
+echo >> "$filename"
+echo "  Securitate:" >> "$filename"
+echo >> "$filename"
 jurnaleSistem
 conexiuniRetea
 sumeControl
@@ -242,7 +247,7 @@ function performantaApp
 
     if ! command -v top &> /dev/null
     then
-        echo "top nu este instalat. Instalare..."
+        echo "top nu este instalat. Instalare..." >> "$filename"
 
         sudo apt-get update
         sudo apt-get install procps -y
@@ -251,7 +256,7 @@ function performantaApp
     folosirecpu=$(top -b -n 1 | grep -E "code$" | tr -s " " | cut -d" " -f10 | tr "," ".")
 
     if [ -z "$folosirecpu" ]; then
-        echo "Nu există procese code în executie!"
+        echo "Nu există procese code în executie!" >> "$filename"
     else
         totalcpu=0
         for folcpu in $folosirecpu
@@ -261,10 +266,10 @@ function performantaApp
                 totalcpu=$(echo "$totalcpu + $folcpu" | bc)
             fi
         done 
-        echo "Gradul de folosire cpu de catre vsc: $totalcpu%"
+        echo "Gradul de folosire cpu de catre vsc: $totalcpu%" >> "$filename"
     fi 
 
-    echo "Numarul de procese vsc: $vsc_procese"
+    echo "Numarul de procese vsc: $vsc_procese" >> "$filename"
 }
 
 # verific daca aplicatia e in executie
@@ -273,15 +278,15 @@ function verificaExecutie
 {
     if pgrep -x "code" > /dev/null
     then 
-        echo "Visual Studio Code este in executie!"
+        echo "Visual Studio Code este in executie!" >> "$filename"
     else 
-        echo "Visual Studio Code NU este in executie!"
+        echo "Visual Studio Code NU este in executie!" >> "$filename"
     fi 
 }
 
-echo
-echo "  Performanta aplicatiei:"
-echo 
+echo >> "$filename"
+echo "  Performanta aplicatiei:" >> "$filename"
+echo >> "$filename"
 performantaApp
 verificaExecutie
 
@@ -291,31 +296,33 @@ verificaExecutie
 function infoExtra
 {
     ultimiiUtilizatori=$(last | head -n -2 | tr -s " " | cut -d " " -f1| sort | uniq -c | tr -s " " | cut -d" " -f3)
-    echo "Ultimii utilizatori conectati sunt:"
-    echo "$ultimiiUtilizatori"
+    echo "Ultimii utilizatori conectati sunt:" >> "$filename"
+    echo "$ultimiiUtilizatori" >> "$filename"
 
     utilCurent=$(whoami)
-    echo "Utilizatorul conectat in acest moment: $utilCurent"
+    echo "Utilizatorul conectat in acest moment: $utilCurent" >> "$filename"
 }
 
 function afiseazaInode
 {
     inoduri=$(ls -li | tail -n +2 | cut -d " " -f1 | tr "\n" ",")
-    echo "Inodurile fisierelor din directorul curent: $inoduri"
+    echo "Inodurile fisierelor din directorul curent: $inoduri" >> "$filename"
 }
 
 function hardlinks_softlinks
 {
     numar_hardlinks=$(find / -maxdepth 1 -type f -links +1 -o -type d -links +1 2>/dev/null | wc -l)
-    echo "Numarul de hardlink-uri din sistem: $numar_hardlinks"
+    echo "Numarul de hardlink-uri din sistem: $numar_hardlinks" >> "$filename"
 
     numar_softlinks=$(find / -maxdepth 1 -type l 2>/dev/null | wc -l)
-    echo "Numarul de softlink-uri din sistem: $numar_softlinks"
+    echo "Numarul de softlink-uri din sistem: $numar_softlinks" >> "$filename"
 }
 
-echo 
-echo "  Informatii extra:"
-echo 
+echo >> "$filename"
+echo "  Informatii extra:" >> "$filename"
+echo >> "$filename"
 infoExtra
 afiseazaInode
 hardlinks_softlinks
+
+#cat "$filename"
