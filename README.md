@@ -26,6 +26,7 @@ Tool monitorizare sisteme linux prin SSH și centralizare
 7. Salvarea datelor despre masinile virtuale monitorizate intr-un fisier specific.
 8. Trimiterea rezultatului specific fiecarei masini virtuale pe aceasta, prin ssh.
 9. Modificare astfel incat conectarea prin ssh sa fie facuta folosind parola sistemului linux.
+10. Creare grafic cu date obtinute din monitorizare pentru fiecare sistem linux.
 
 # 17.06.2024
 README modificat pentru test
@@ -114,8 +115,23 @@ V. Diverse
 1. Am modificat pe masina tinta si pe masina gazda fisierul /etc/ssh/sshd_config, astfel incat sa am urmatoarele campuri decomentate sau adaugate astfel:
     * PubkeyAuthentication no
     * PasswordAuthentication yes
-! Aceste modificari au fost necesare pentru a ma conecta prin ssh folosind parola
+
+    Aceste modificari au fost necesare pentru a ma conecta prin ssh folosind parola
 
 2. Am instalat inca o masina virtuala in Virtual Box si am configurat-o astfel incat sa ma pot conecta de pe LinuxMint pe aceasta folosind ssh.
 
-3. Am creat un nou script prin intermediul caruia ma voi conecta la masinile tinta pentru a le monitoriza. Voi salva rezultatele monitorizarii intr-un fisier salvat in directorul curent al masinii tina.
+3. Am creat un nou script prin intermediul caruia ma voi conecta la masinile tinta pentru a le monitoriza. Voi salva rezultatele monitorizarii intr-un fisier salvat in directorul curent al masinii tinta.
+
+# 21.06.2024
+
+1. Am scris scriptul "plot.py". Acesta se ocupa de crearea unui grafic pe baza unui fisier text care contine informatiile care au fost monitorizate pe un sistem linux. Graficul realizat va fi salvat local pe masina tinta sub numele "grafic.png". 
+
+2. In scriptul "aplicatie.sh", inainte de rularea scriptului "monitor.sh" am trimis pe masina tinta codul din "plot.py" folosind comanda: "scp plot.py daria@10.0.2.15:" (exemplul este pentru sistemul linux ubuntu).
+
+3. In scriptul "monitor.sh" am facut unele modificari precum:
+    - am creat un fisier unic pe fiecare masina tinta in care am salvat datele ce vor fi introduse in grafic.
+    - am oferit permisiuni de executie scriptului "plot.py" de pe masina tinta, apoi l-am rulat folosind comanda: "python3 plot.py".
+
+4. Dupa executarea scriptului "monitor.sh", am copiat graficul de pe masina tinta pe masina gazda folosind comanda: "scp daria@10.0.2.5:grafic.png .", apoi l-am redenumit, adaugand "_{numele sistemului pe care il reprezinta}".
+
+5. Am mai creat un fisier "/home/daria/parole_vms", i-am modificat owner-ul si group owner-ul in *root* si i-am dat drepturi de citire si scriere doar lui *root*. In acest fisier am salvat parolele necesare pentru conectarea pe fiecare sistem linux tinta.

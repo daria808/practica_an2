@@ -5,6 +5,9 @@ touch "$filename"
 echo "Statistici:" > "$filename"
 echo >> "$filename"
 
+sistem="$2"
+echo "nume, val" > "$sistem"
+
 # PERFORMANTA GENERALA
 
 # procentul de timp CPU utilizat de procesele din sistem
@@ -25,6 +28,7 @@ function procentTimpProcese
 
     cpu_total=$(echo "scale=2; $cpu_total / $numar_cpu" | bc)
     echo "Procentul total de utilizare a CPU de catre procesele din sistem este: $cpu_total%" >> "$filename"
+    echo "cpu, $cpu_total" >> "$sistem"
 }
 
 # cantitatea de memorie RAM utilizata si disponibila
@@ -33,11 +37,14 @@ function memorieRAM
 {
     detalii_memorie=$(free -h | grep -iE mem | tr -s ' ')
 
-    mem_totala=$(echo "$detalii_memorie" | cut -d' ' -f2)
-    mem_folosita=$(echo "$detalii_memorie" | cut -d' ' -f3)
-    mem_disponibila=$(echo "$detalii_memorie" | cut -d' ' -f4)
+    mem_totala=$(echo "$detalii_memorie" | cut -d' ' -f2 | tr "," ".")
+    mem_folosita=$(echo "$detalii_memorie" | cut -d' ' -f3 | tr "," ".")
+    mem_disponibila=$(echo "$detalii_memorie" | cut -d' ' -f4 | tr "," ".")
 
     echo "Informatii despre memoria RAM -> totala: $mem_totala, utilizata: $mem_folosita, disponibila: $mem_disponibila" >> "$filename"
+    echo "mem_total, $mem_totala" >> "$sistem"
+    echo "mem_folosita, $mem_folosita" >> "$sistem"
+    echo "mem_disponibila, $mem_disponibila" >> "$sistem"
 }
 
 # numarul toatal de procese, procese care ruleaza, procese care asteapta sa fie rulate si load average
@@ -51,6 +58,9 @@ function detaliiProcese
 
 
     echo "Numar_procese: $numar_procese, numar_procese_running: $numar_procese_r, numar_procese_waiting: $numar_procese_w, Load_average: $load_average" >> "$filename"
+    echo "nr_procese, $numar_procese" >> "$sistem"
+    echo "procese_running, $numar_procese_r" >> "$sistem"
+    echo "procese_waiting, $numar_procese_w" >> "$sistem"
 }
 
 # cantitatea de spatiu pe disk utilizat si disponibil pentru partitiile sistemului
@@ -326,3 +336,6 @@ afiseazaInode
 hardlinks_softlinks
 
 #cat "$filename"
+
+chmod +x plot.py
+python3 plot.py
