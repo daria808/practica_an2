@@ -139,3 +139,9 @@ V. Diverse
 # 25.06.2024
 
 - am configurat aplicatia astfel incat parola sa fie introdusa automat in cazul operarii remote, folosind *sshpass*, parola fiind extrasa din fisierul descris anterior.
+
+- am creat un fisier numit "statistici" in care am concatenat rezultatul monitorizarii pe sistemele linux.
+
+- am creat un alt fisier, numit "pachete" in care am salvat pachetele instalate pe fiecare sistem.
+
+- am scris functiile *verificaExistentaPachete*, *osDetalii* si *verificaDNS*. Prima e pentru fisierul nou creat "pachete", a doua extrage informatiile despre distributie si despre versiunea kernelului, iar ultima trimite un singur pachet si asteapta o secunda pentru raspuns de la serverul DNS.

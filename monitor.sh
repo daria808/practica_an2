@@ -2,7 +2,8 @@
 
 filename="$1"
 touch "$filename"
-echo "Statistici:" > "$filename"
+echo > "$filename"
+echo "$filename:" >> "$filename"
 echo >> "$filename"
 
 sistem="$2"
@@ -29,7 +30,7 @@ function procentTimpProcese
     done 
 
     cpu_total=$(echo "scale=2; $cpu_total / $numar_cpu" | bc)
-    echo "Procentul total de utilizare a CPU de catre procesele din sistem este: $cpu_total%" >> "$filename"
+    echo " CPU = $cpu_total%" >> "$filename"
     echo "cpu, $cpu_total" >> "$sistem"
 }
 
@@ -43,7 +44,9 @@ function memorieRAM
     mem_folosita=$(echo "$detalii_memorie" | cut -d' ' -f3 | tr "," ".")
     mem_disponibila=$(echo "$detalii_memorie" | cut -d' ' -f4 | tr "," ".")
 
-    echo "Informatii despre memoria RAM -> totala: $mem_totala, utilizata: $mem_folosita, disponibila: $mem_disponibila" >> "$filename"
+    echo " mem_total = $mem_totala" >> "$filename"
+    echo " mem_folosita = $mem_folosita" >> "$filename"
+    echo " mem_disponibila = $mem_disponibila" >> "$filename"
     echo "mem_total, $mem_totala" >> "$sistem"
     echo "mem_folosita, $mem_folosita" >> "$sistem"
     echo "mem_disponibila, $mem_disponibila" >> "$sistem"
@@ -59,7 +62,10 @@ function detaliiProcese
     numar_procese_w=$(ps -eo stat --no-headers |  grep -E "D|I" | wc -l)
 
 
-    echo "Numar_procese: $numar_procese, numar_procese_running: $numar_procese_r, numar_procese_waiting: $numar_procese_w, Load_average: $load_average" >> "$filename"
+    echo " numar_procese = $numar_procese" >> "$filename"
+    echo " numar_procese_running = $numar_procese_r" >> "$filename"
+    echo " numar_procese_waiting = $numar_procese_w" >> "$filename"
+    echo " Load_average = $load_average" >> "$filename"
     echo "nr_procese, $numar_procese" >> "$sistem"
     echo "procese_running, $numar_procese_r" >> "$sistem"
     echo "procese_waiting, $numar_procese_w" >> "$sistem"
@@ -85,7 +91,8 @@ function spatiuDisk
         total_disponibil=$(echo "$total_disponibil + $du_disp" | bc)
     done
 
-    echo "Disk_usage_folosit: $total_folosit, disk_usage_disponibil: $total_disponibil" >> "$filename"
+    echo " disk_usage_folosit = $total_folosit" >> "$filename"
+    echo " disk_usage_disponibil = $total_disponibil" >> "$filename"
 }
 
 # rate de citire si scriere a discurilor
@@ -95,7 +102,7 @@ function rateCitireScriere
     # pentru "iostat" am nevoie de bibliotecta "sysstat"
     if ! command -v iostat &> /dev/null
     then
-        echo "sysstat nu este instalat. Instalare..." >> "$filename"
+        echo " sysstat nu este instalat. Instalare..." >> "$filename"
 
         sshpass -p "$pass" sudo apt-get update
         sshpass -p "$pass" sudo apt-get install sysstat -y
@@ -123,12 +130,13 @@ function rateCitireScriere
         fi 
     done 
 
-    echo "rata_citire_disk: $total_citire kB_read/s, rata_scriere_disk: $total_scriere kB_wrtn/s" >> "$filename"
+    echo " rata_citire_disk = $total_citire" >> "$filename"
+    echo " rata_scriere_disk = $total_scriere" >> "$filename"
 }
 
 
 
-echo "  Performanta generala:" >> "$filename"
+echo "-performanta generala:" >> "$filename"
 echo >> "$filename"
 procentTimpProcese
 memorieRAM
@@ -144,7 +152,7 @@ rateCitireScriere
 
 function infoProcese
 {
-    echo "Utilizarea CPU si memorie a fiecarui proces:" >> "$filename"
+    echo " Utilizarea CPU si memorie a fiecarui proces:" >> "$filename"
     ps -eo pid,%cpu,%mem --sort=-%cpu | head -n 20 >> "$filename"
     echo >> "$filename"
 }
@@ -156,7 +164,8 @@ function traficTransmisPrimit
     pachete_primite=$(grep -E "enp0s3" /proc/net/dev | tr -s " " | cut -d" " -f3)
     pachete_trimise=$(grep -E "enp0s3" /proc/net/dev | tr -s " " | cut -d" " -f10)
 
-    echo "Pachete trimise: $pachete_trimise, pachete primite: $pachete_primite" >> "$filename"
+    echo " pachete trimise = $pachete_trimise" >> "$filename"
+    echo " pachete primite = $pachete_primite" >> "$filename"
 }
 
 # numarul de conexiuni de retea active
@@ -165,12 +174,12 @@ function conexiuniActive
 {
     numar_conexiuni=$(ss -s | head -n1 | cut -d" " -f2)
 
-    echo "Numarul de conexiuni active: $numar_conexiuni" >> "$filename"
+    echo " Numarul de conexiuni active = $numar_conexiuni" >> "$filename"
 }
 
 
 echo >> "$filename"
-echo "  Resurse de sistem:" >> "$filename"
+echo "-resurse de sistem:" >> "$filename"
 echo >> "$filename"
 infoProcese
 traficTransmisPrimit
@@ -184,7 +193,7 @@ conexiuniActive
 function jurnaleSistem
 {
     jurnal=$(journalctl -n 10)
-    echo "Ultimele 10 intrari in jurnalul de sistem:" >> "$filename"
+    echo " Ultimele 10 intrari in jurnalul de sistem:" >> "$filename"
     echo "$jurnal" >> "$filename"
 }
 
@@ -194,7 +203,7 @@ function conexiuniRetea
 {
     if ! command -v netstat &> /dev/null
     then
-        echo "netstat nu este instalat. Instalare..." >> "$filename"
+        echo " netstat nu este instalat. Instalare..." >> "$filename"
 
         sshpass -p "$pass" sudo apt-get update
         sshpass -p "$pass" sudo apt-get install -y net-tools
@@ -202,7 +211,7 @@ function conexiuniRetea
 
     conex=$(netstat -tuln)
     echo >> "$filename"
-    echo "Conexiuni active:" >> "$filename"
+    echo " Conexiuni active:" >> "$filename"
     echo "$conex" >> "$filename"
     echo >> "$filename"
 }
@@ -213,7 +222,7 @@ function jurnalAuth
 {
     jurnAuth=$(tail -n 10 /var/log/auth.log)
     echo >> "$filename"
-    echo "Ultimele 10 mesaje din jurnalul de autentificare auth.log" >> "$filename"
+    echo " Ultimele 10 mesaje din jurnalul de autentificare auth.log" >> "$filename"
     echo "$jurnAuth" >> "$filename"
     echo >> "$filename"
 }
@@ -232,15 +241,15 @@ function sumeControl
     
     if cmp -s "sumeInitiale" "sumeComparare"
     then
-        echo "Fisierele din sistem NU sunt modificate!" >> "$filename"
+        echo " Fisierele din sistem NU sunt modificate!" >> "$filename"
     else
-        echo "Fisierele din sistem sunt modificate!" >> "$filename"
+        echo " Fisierele din sistem sunt modificate!" >> "$filename"
     fi
 }
 
 
 echo >> "$filename"
-echo "  Securitate:" >> "$filename"
+echo "-securitate:" >> "$filename"
 echo >> "$filename"
 jurnaleSistem
 conexiuniRetea
@@ -258,7 +267,7 @@ function performantaApp
 
     if ! command -v top &> /dev/null
     then
-        echo "top nu este instalat. Instalare..." >> "$filename"
+        echo " top nu este instalat. Instalare..." >> "$filename"
 
         sshpass -p "$pass" sudo apt-get update
         sshpass -p "$pass" sudo apt-get install procps -y
@@ -267,7 +276,7 @@ function performantaApp
     folosirecpu=$(top -b -n 1 | grep -E "code$" | tr -s " " | cut -d" " -f10 | tr "," ".")
 
     if [ -z "$folosirecpu" ]; then
-        echo "Nu există procese code în executie!" >> "$filename"
+        echo " Nu există procese code în executie!" >> "$filename"
     else
         totalcpu=0
         for folcpu in $folosirecpu
@@ -277,10 +286,10 @@ function performantaApp
                 totalcpu=$(echo "$totalcpu + $folcpu" | bc)
             fi
         done 
-        echo "Gradul de folosire cpu de catre vsc: $totalcpu%" >> "$filename"
+        echo " Gradul de folosire cpu de catre vsc: $totalcpu%" >> "$filename"
     fi 
 
-    echo "Numarul de procese vsc: $vsc_procese" >> "$filename"
+    echo " Numarul de procese vsc: $vsc_procese" >> "$filename"
 }
 
 # verific daca aplicatia e in executie
@@ -289,17 +298,17 @@ function verificaExecutie
 {
     if pgrep -x "code" > /dev/null
     then 
-        echo "Visual Studio Code este in executie!" >> "$filename"
+        echo " Visual Studio Code este in executie!" >> "$filename"
     else 
-        echo "Visual Studio Code NU este in executie!" >> "$filename"
+        echo " Visual Studio Code NU este in executie!" >> "$filename"
     fi 
 }
 
 echo >> "$filename"
-echo "  Performanta aplicatiei:" >> "$filename"
+echo "-performanta aplicatiei:" >> "$filename"
 echo >> "$filename"
-performantaApp
 verificaExecutie
+performantaApp
 
 
 # DIVERSE
@@ -307,36 +316,71 @@ verificaExecutie
 function infoExtra
 {
     ultimiiUtilizatori=$(last | head -n -2 | tr -s " " | cut -d " " -f1| sort | uniq -c | tr -s " " | cut -d" " -f3)
-    echo "Ultimii utilizatori conectati sunt:" >> "$filename"
+    echo " Ultimii utilizatori conectati sunt:" >> "$filename"
     echo "$ultimiiUtilizatori" >> "$filename"
 
     utilCurent=$(whoami)
-    echo "Utilizatorul conectat in acest moment: $utilCurent" >> "$filename"
+    echo " Utilizatorul conectat in acest moment: $utilCurent" >> "$filename"
 }
 
 function afiseazaInode
 {
     inoduri=$(ls -li | tail -n +2 | cut -d " " -f1 | tr "\n" ",")
-    echo "Inodurile fisierelor din directorul curent: $inoduri" >> "$filename"
+    echo " inoduri din directorul curent = $inoduri" >> "$filename"
 }
 
 function hardlinks_softlinks
 {
     numar_hardlinks=$(find / -maxdepth 1 -type f -links +1 -o -type d -links +1 2>/dev/null | wc -l)
-    echo "Numarul de hardlink-uri din sistem: $numar_hardlinks" >> "$filename"
+    echo " hardlink-uri = $numar_hardlinks" >> "$filename"
 
     numar_softlinks=$(find / -maxdepth 1 -type l 2>/dev/null | wc -l)
-    echo "Numarul de softlink-uri din sistem: $numar_softlinks" >> "$filename"
+    echo " softlink-uri = $numar_softlinks" >> "$filename"
 }
 
 echo >> "$filename"
-echo "  Informatii extra:" >> "$filename"
+echo "-informatii extra:" >> "$filename"
 echo >> "$filename"
 infoExtra
 afiseazaInode
 hardlinks_softlinks
 
-#cat "$filename"
+# VERIFICARE PACHETE
+
+function verificaExistentaPachete
+{
+    echo > pachete
+    echo "$filename:" >> pachete
+    echo >> pachete
+    cat /var/lib/dpkg/status | grep -E '^Package:' | cut -d: -f2 >> pachete
+}
+
+verificaExistentaPachete
+
+function osDetalii
+{
+    distributie=$(cat /etc/os-release  | grep -E "PRETTY_NAME" | cut -d'"' -f2 )
+    versiune_kernel=$(uname -r)
+
+    echo " distributie = $distributie" >> "$filename"
+    echo " versiune kernel = $versiune_kernel" >> "$filename"
+}
+
+osDetalii
+
+dns_server="8.8.8.8"
+
+function verificaDNS
+{
+    if ping -c 1 -W 1 $dns_server >/dev/null
+    then
+        echo " $(date +'%Y-%m-%d %H:%M:%S') - Serverul DNS ($dns_server) este disponibil" >> "$filename"
+    else
+        echo " $(date +'%Y-%m-%d %H:%M:%S') - Serverul DNS ($dns_server) NU este disponibil" >> "$filename"
+    fi
+}
+
+verificaDNS
 
 chmod +x plot.py
 python3 plot.py
