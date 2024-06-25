@@ -21,7 +21,7 @@ def citeste_date_fisier(nume_fisier):
 
 def afiseaza_grafic(descrieri, valori):
     plt.figure(figsize=(10, 9))
-    plt.barh(descrieri, valori, color='skyblue')
+    plt.barh(descrieri, valori, color='salmon')
     plt.xlabel('Valoare')
     plt.ylabel('Tipul')
     plt.title('Grafic date sistem linux')

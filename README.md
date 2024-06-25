@@ -135,3 +135,7 @@ V. Diverse
 4. Dupa executarea scriptului "monitor.sh", am copiat graficul de pe masina tinta pe masina gazda folosind comanda: "scp daria@10.0.2.5:grafic.png .", apoi l-am redenumit, adaugand "_{numele sistemului pe care il reprezinta}".
 
 5. Am mai creat un fisier "/home/daria/parole_vms", i-am modificat owner-ul si group owner-ul in *root* si i-am dat drepturi de citire si scriere doar lui *root*. In acest fisier am salvat parolele necesare pentru conectarea pe fiecare sistem linux tinta.
+
+# 25.06.2024
+
+- am configurat aplicatia astfel incat parola sa fie introdusa automat in cazul operarii remote, folosind *sshpass*, parola fiind extrasa din fisierul descris anterior.

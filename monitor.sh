@@ -8,6 +8,8 @@ echo >> "$filename"
 sistem="$2"
 echo "nume, val" > "$sistem"
 
+pass="$3"
+
 # PERFORMANTA GENERALA
 
 # procentul de timp CPU utilizat de procesele din sistem
@@ -95,8 +97,8 @@ function rateCitireScriere
     then
         echo "sysstat nu este instalat. Instalare..." >> "$filename"
 
-        sudo apt-get update
-        sudo apt-get install sysstat -y
+        sshpass -p "$pass" sudo apt-get update
+        sshpass -p "$pass" sudo apt-get install sysstat -y
     fi
 
     rata_citire=$(iostat | tail -n +7 | tr -s ' ' | cut -d' ' -f3 | tr "," ".")
@@ -155,7 +157,6 @@ function traficTransmisPrimit
     pachete_trimise=$(grep -E "enp0s3" /proc/net/dev | tr -s " " | cut -d" " -f10)
 
     echo "Pachete trimise: $pachete_trimise, pachete primite: $pachete_primite" >> "$filename"
-    
 }
 
 # numarul de conexiuni de retea active
@@ -195,8 +196,8 @@ function conexiuniRetea
     then
         echo "netstat nu este instalat. Instalare..." >> "$filename"
 
-        sudo apt-get update
-        sudo apt-get install -y net-tools
+        sshpass -p "$pass" sudo apt-get update
+        sshpass -p "$pass" sudo apt-get install -y net-tools
     fi 
 
     conex=$(netstat -tuln)
@@ -259,8 +260,8 @@ function performantaApp
     then
         echo "top nu este instalat. Instalare..." >> "$filename"
 
-        sudo apt-get update
-        sudo apt-get install procps -y
+        sshpass -p "$pass" sudo apt-get update
+        sshpass -p "$pass" sudo apt-get install procps -y
     fi 
 
     folosirecpu=$(top -b -n 1 | grep -E "code$" | tr -s " " | cut -d" " -f10 | tr "," ".")
