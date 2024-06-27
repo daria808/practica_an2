@@ -145,3 +145,7 @@ V. Diverse
 - am creat un alt fisier, numit "pachete" in care am salvat pachetele instalate pe fiecare sistem.
 
 - am scris functiile *verificaExistentaPachete*, *osDetalii* si *verificaDNS*. Prima e pentru fisierul nou creat "pachete", a doua extrage informatiile despre distributie si despre versiunea kernelului, iar ultima trimite un singur pachet si asteapta o secunda pentru raspuns de la serverul DNS.
+
+# 27.06.2024
+
+- am modificat scriptul "aplicatie.sh" astfel incat la rularea acestuia sa fie nevoie sa adaug ca parametrii *user@ip* si *nume sistem* (de ex: 'ubuntu') pentru a putea generaliza pentru orice sistem linux. Rezultatele vor fi scrise cu append in fisierele "statistici" si "pachete".
